@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -205,7 +205,6 @@
 
       .letter-message {
         display: block;
-        border-right: 2px solid rgba(255, 105, 180, 0.8);
         animation: caretBlink 0.85s step-end infinite;
         white-space: pre-line;
         min-height: 1.9em;
@@ -879,33 +878,7 @@
       <div id="screen-letter" class="hidden">
         <div class="content-box">
           <h2>💕 HAPPIEST BIRTHDAY, MY LOVE! 💕</h2>
-          <p
-            id="letter-message"
-            class="letter-message"
-            data-text="Happy Birthday!&#10;&#10;You make every day feel special just by being in it. So today"
-          >
-            I hope you love the flowers I sent you, and I also really want to
-            give a huge thank you to Ate Meah for helping me get them because
-            I’m super grateful for her help. I know bago pa lang tayo and
-            there’s still so much ahead of us, but I just want to say that I’m
-            really in love with you and I truly want you. I want to treat you
-            the way you deserve and make you feel as special as you really are.
-            I know minsan may awkward silences tayo and I hope hindi ka
-            nabobored kapag ganun, kasi ganun talaga ako minsan, but even in
-            those quiet moments I really appreciate every second with you. Kahit
-            lagi mo akong awayin, ikaw pa rin ang gusto ko and hindi ako
-            magsasawa sa’yo. You make me soft and I just want to be gentle with
-            you because you make me feel so much love, and I just want to love
-            you the way you deserve. I understand that when I say I won’t be
-            like the others it might be hard to believe, and that’s okay,
-            because I just want to show you day by day how important you are to
-            me and how serious I am about us. I can’t wait for all the
-            experiences we’ll have together :> the laughs, the small adventures,
-            the simple conversations, and everything else. I know a
-            long-distance relationship can be hard, and this is my first time,
-            but I really want to make this work. I love you so much, and I hope
-            you enjoy your birthday to the fullest. I love you endlessly – Kiii.
-          </p>
+          <p id="letter-message" class="letter-message"></p>
           <p
             style="
               text-align: right;
@@ -973,11 +946,73 @@
     ></audio>
     <script>
       const letterHoverAudio = document.getElementById("letter-hover-audio");
+      let letterAudioFadeInterval = null;
+      let letterMessageData = null;
+      let letterMessagePromise =
+        typeof fetch === "function"
+          ? fetch("letter-message.json")
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Failed to load letter message");
+                }
+                return response.json();
+              })
+              .then((data) => {
+                const message =
+                  data && typeof data.birthdayLetter === "string"
+                    ? data.birthdayLetter
+                    : "";
+                letterMessageData = { message };
+                return letterMessageData;
+              })
+              .catch(() => {
+                letterMessageData = { message: "" };
+                return letterMessageData;
+              })
+          : null;
 
       function stopLetterAudio() {
         if (!letterHoverAudio) return;
+        if (letterAudioFadeInterval) {
+          clearInterval(letterAudioFadeInterval);
+          letterAudioFadeInterval = null;
+        }
         letterHoverAudio.pause();
         letterHoverAudio.currentTime = 0;
+        letterHoverAudio.volume = 0;
+      }
+      function fadeInLetterAudio(audio, duration = 2000) {
+        if (!audio) return;
+        if (letterAudioFadeInterval) {
+          clearInterval(letterAudioFadeInterval);
+          letterAudioFadeInterval = null;
+        }
+        const fadeDuration = Math.max(duration, 0);
+        const steps = 20;
+        const stepTime = steps > 0 ? fadeDuration / steps : fadeDuration;
+        const volumeStep = steps > 0 ? 1 / steps : 1;
+
+        audio.currentTime = 0;
+        audio.volume = 0;
+        const playPromise = audio.play();
+        if (playPromise && typeof playPromise.then === "function") {
+          playPromise.catch(() => {});
+        }
+
+        if (!stepTime) {
+          audio.volume = 1;
+          return;
+        }
+
+        letterAudioFadeInterval = setInterval(() => {
+          const nextVolume = Math.min(1, audio.volume + volumeStep);
+          audio.volume = nextVolume;
+          if (nextVolume >= 1) {
+            clearInterval(letterAudioFadeInterval);
+            letterAudioFadeInterval = null;
+            audio.volume = 1;
+          }
+        }, stepTime);
       }
       function hideAll() {
         stopLetterAudio();
@@ -1009,6 +1044,10 @@
       }
       function showLetter() {
         showScreen("screen-letter");
+        typeLetterMessage();
+        if (letterHoverAudio) {
+          fadeInLetterAudio(letterHoverAudio, 5000);
+        }
       }
       function showPhotos() {
         showScreen("screen-photos");
@@ -1044,6 +1083,27 @@
       })();
       const typeLetterMessage = (() => {
         let typingTimer;
+        const startTyping = (letterMessage, text) => {
+          const safeText = text || "";
+          letterMessage.dataset.text = safeText;
+          letterMessage.textContent = "";
+          letterMessage.classList.remove("finished");
+
+          let charIndex = 0;
+          const typeNext = () => {
+            if (charIndex <= safeText.length) {
+              letterMessage.textContent = safeText.slice(0, charIndex);
+              charIndex += 1;
+              typingTimer = setTimeout(typeNext, 45);
+            } else {
+              letterMessage.textContent = safeText;
+              letterMessage.classList.add("finished");
+            }
+          };
+
+          typeNext();
+        };
+
         return () => {
           const letterMessage = document.getElementById("letter-message");
           if (!letterMessage) return;
@@ -1052,38 +1112,42 @@
             clearTimeout(typingTimer);
           }
 
-          const text =
-            letterMessage.dataset.text || letterMessage.textContent || "";
-          letterMessage.dataset.text = text;
-          letterMessage.textContent = "";
-          letterMessage.classList.remove("finished");
+          const existingText =
+            (letterMessageData && typeof letterMessageData.message === "string"
+              ? letterMessageData.message
+              : "") ||
+            letterMessage.dataset.text ||
+            letterMessage.textContent ||
+            "";
 
-          let charIndex = 0;
-
-          const typeNext = () => {
-            if (charIndex <= text.length) {
-              letterMessage.textContent = text.slice(0, charIndex);
-              charIndex += 1;
-              typingTimer = setTimeout(typeNext, 45);
-            } else {
-              letterMessage.textContent = text;
-              letterMessage.classList.add("finished");
+          if (existingText) {
+            if (
+              !letterMessageData ||
+              typeof letterMessageData.message !== "string"
+            ) {
+              letterMessageData = { message: existingText };
             }
-          };
+            startTyping(letterMessage, existingText);
+            return;
+          }
 
-          typeNext();
+          if (!letterMessagePromise) {
+            startTyping(letterMessage, "");
+            return;
+          }
+
+          letterMessagePromise
+            .then((data) => {
+              const resolved =
+                data && typeof data.message === "string" ? data.message : "";
+              startTyping(letterMessage, resolved);
+            })
+            .catch(() => {
+              startTyping(letterMessage, "");
+            });
         };
       })();
 
-      const letterContentBox = document.querySelector(
-        "#screen-letter .content-box"
-      );
-      if (letterContentBox) {
-        letterContentBox.addEventListener("mouseenter", () => {
-          if (!letterHoverAudio) return;
-          letterHoverAudio.play().catch(() => {});
-        });
-      }
     </script>
   </body>
 </html>
