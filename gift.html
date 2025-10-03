@@ -1086,11 +1086,9 @@
       if (letterContentBox) {
         letterContentBox.addEventListener("mouseenter", () => {
           if (!letterHoverAudio) return;
-          // letterHoverAudio.currentTime = 0;
           letterHoverAudio.play().catch(() => {});
         });
 
-        // letterContentBox.addEventListener("mouseleave", stopLetterAudio);
       }
     </script>
   </body>
