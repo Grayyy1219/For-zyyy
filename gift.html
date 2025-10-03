@@ -203,19 +203,11 @@
         text-wrap: auto;
       }
 
-      .typewriter.finished {
-        border-right: none;
-        animation: none;
-        width: 100%;
-        height: fit-content;
-        text-wrap: auto;
-      }
-
-      .letter-line {
+      .letter-message {
         display: block;
         border-right: 2px solid rgba(255, 105, 180, 0.8);
         animation: caretBlink 0.85s step-end infinite;
-        white-space: pre-wrap;
+        white-space: pre-line;
         min-height: 1.9em;
         padding-right: 6px;
         margin-bottom: 12px;
@@ -224,7 +216,7 @@
         font-size: 16px;
       }
 
-      .letter-line.finished {
+      .letter-message.finished {
         border-right: none;
         animation: none;
       }
@@ -887,13 +879,13 @@
       <div id="screen-letter" class="hidden">
         <div class="content-box">
           <h2>💕 HAPPIEST BIRTHDAY, MY LOVE! 💕</h2>
-          <p>Happy Birthday</p>
-
           <p
-            class="letter-line"
-            data-text="You make every day feel special just by being in it. So today"
+            id="letter-message"
+            class="letter-message"
+            data-text="Happy Birthday!&#10;&#10;You make every day feel special just by being in it. So today"
           >
-            You make every day feel special just by being in it. So today
+            Happy Birthday! You make every day feel special just by being in it.
+            So today
           </p>
           <p
             style="
@@ -1034,45 +1026,29 @@
       const typeLetterMessage = (() => {
         let typingTimer;
         return () => {
-          const letterScreen = document.getElementById("screen-letter");
-          if (!letterScreen) return;
-          const lines = Array.from(
-            letterScreen.querySelectorAll(".letter-line")
-          );
-          if (!lines.length) return;
+          const letterMessage = document.getElementById("letter-message");
+          if (!letterMessage) return;
 
           if (typingTimer) {
             clearTimeout(typingTimer);
           }
 
-          lines.forEach((line) => {
-            const text = line.dataset.text || line.textContent || "";
-            line.dataset.text = text;
-            line.textContent = "";
-            line.classList.remove("finished");
-          });
+          const text =
+            letterMessage.dataset.text || letterMessage.textContent || "";
+          letterMessage.dataset.text = text;
+          letterMessage.textContent = "";
+          letterMessage.classList.remove("finished");
 
-          let lineIndex = 0;
           let charIndex = 0;
 
           const typeNext = () => {
-            const currentLine = lines[lineIndex];
-            if (!currentLine) return;
-
-            const text = currentLine.dataset.text || "";
-
             if (charIndex <= text.length) {
-              currentLine.textContent = text.slice(0, charIndex);
+              letterMessage.textContent = text.slice(0, charIndex);
               charIndex += 1;
               typingTimer = setTimeout(typeNext, 45);
             } else {
-              currentLine.textContent = text;
-              currentLine.classList.add("finished");
-              lineIndex += 1;
-              if (lineIndex < lines.length) {
-                charIndex = 0;
-                typingTimer = setTimeout(typeNext, 350);
-              }
+              letterMessage.textContent = text;
+              letterMessage.classList.add("finished");
             }
           };
 
@@ -1088,7 +1064,6 @@
           if (!letterHoverAudio) return;
           letterHoverAudio.play().catch(() => {});
         });
-
       }
     </script>
   </body>
