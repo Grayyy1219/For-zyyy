@@ -211,6 +211,23 @@
         text-wrap: auto;
       }
 
+      .letter-line {
+        display: block;
+        border-right: 2px solid rgba(255, 105, 180, 0.8);
+        animation: caretBlink 0.85s step-end infinite;
+        white-space: pre-wrap;
+        min-height: 1.9em;
+        padding-right: 6px;
+        margin-bottom: 12px;
+        color: #555;
+        line-height: 1.9;
+        font-size: 16px;
+      }
+
+      .letter-line.finished {
+        border-right: none;
+        animation: none;
+      }
       @keyframes caretBlink {
         from {
           border-color: rgba(255, 105, 180, 0.85);
@@ -872,7 +889,13 @@
           <h2>💕 HAPPIEST BIRTHDAY, MY LOVE! 💕</h2>
           <p>Happy Birthday</p>
 
-          <p>You make every day feel special just by being in it. So today</p><p
+          <p
+            class="letter-line"
+            data-text="You make every day feel special just by being in it. So today"
+          >
+            You make every day feel special just by being in it. So today
+          </p>
+          <p
             style="
               text-align: right;
               font-style: italic;
@@ -931,9 +954,22 @@
         <button class="back-btn" onclick="showScreen2()">← Back</button>
       </div>
     </div>
-
+    <audio
+      id="letter-hover-audio"
+      src="audio/LetterSong.mp3"
+      preload="auto"
+      aria-hidden="true"
+    ></audio>
     <script>
+      const letterHoverAudio = document.getElementById("letter-hover-audio");
+
+      function stopLetterAudio() {
+        if (!letterHoverAudio) return;
+        letterHoverAudio.pause();
+        letterHoverAudio.currentTime = 0;
+      }
       function hideAll() {
+        stopLetterAudio();
         document.querySelectorAll(".container > div").forEach((el) => {
           el.classList.add("hidden");
           el.classList.remove("fade-in");
@@ -995,6 +1031,67 @@
           typeNext();
         };
       })();
+      const typeLetterMessage = (() => {
+        let typingTimer;
+        return () => {
+          const letterScreen = document.getElementById("screen-letter");
+          if (!letterScreen) return;
+          const lines = Array.from(
+            letterScreen.querySelectorAll(".letter-line")
+          );
+          if (!lines.length) return;
+
+          if (typingTimer) {
+            clearTimeout(typingTimer);
+          }
+
+          lines.forEach((line) => {
+            const text = line.dataset.text || line.textContent || "";
+            line.dataset.text = text;
+            line.textContent = "";
+            line.classList.remove("finished");
+          });
+
+          let lineIndex = 0;
+          let charIndex = 0;
+
+          const typeNext = () => {
+            const currentLine = lines[lineIndex];
+            if (!currentLine) return;
+
+            const text = currentLine.dataset.text || "";
+
+            if (charIndex <= text.length) {
+              currentLine.textContent = text.slice(0, charIndex);
+              charIndex += 1;
+              typingTimer = setTimeout(typeNext, 45);
+            } else {
+              currentLine.textContent = text;
+              currentLine.classList.add("finished");
+              lineIndex += 1;
+              if (lineIndex < lines.length) {
+                charIndex = 0;
+                typingTimer = setTimeout(typeNext, 350);
+              }
+            }
+          };
+
+          typeNext();
+        };
+      })();
+
+      const letterContentBox = document.querySelector(
+        "#screen-letter .content-box"
+      );
+      if (letterContentBox) {
+        letterContentBox.addEventListener("mouseenter", () => {
+          if (!letterHoverAudio) return;
+          // letterHoverAudio.currentTime = 0;
+          letterHoverAudio.play().catch(() => {});
+        });
+
+        // letterContentBox.addEventListener("mouseleave", stopLetterAudio);
+      }
     </script>
   </body>
 </html>
