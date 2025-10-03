@@ -81,7 +81,7 @@
         -webkit-backdrop-filter: blur(20px);
         border-radius: 40px;
         padding: 60px 50px;
-        max-width: 800px;
+        max-width: 1200px;
         width: 100%;
         box-shadow: 0 25px 80px rgba(255, 105, 180, 0.25),
           0 10px 40px rgba(255, 182, 193, 0.2),
@@ -566,27 +566,97 @@
         }
       }
 
-      .song-info {
+      .song-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 22px;
+        margin-top: 30px;
+      }
+
+      .song-card {
+        background: linear-gradient(
+          160deg,
+          rgba(255, 240, 248, 0.9) 0%,
+          rgba(255, 228, 240, 0.95) 50%,
+          rgba(255, 214, 235, 0.9) 100%
+        );
+        border-radius: 20px;
+        padding: 20px 18px;
+        box-shadow: 0 15px 30px rgba(255, 105, 180, 0.15);
+        border: 1px solid rgba(255, 192, 203, 0.4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         text-align: center;
-        margin-top: 25px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .song-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 35px rgba(255, 105, 180, 0.25);
+      }
+
+      .song-cover {
+        width: 70%;
+        aspect-ratio: 1 / 1;
+        border-radius: 16px;
+        background: linear-gradient(140deg, #ff69b4, #ff1493);
+        display: grid;
+        place-items: center;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        box-shadow: inset 0 0 25px rgba(255, 255, 255, 0.25);
+      }
+      .song-cover-1 {
+        background-image: url(https://i.scdn.co/image/ab67616d00001e028c9b415ea3933ba5664e0382);
+        background-size: contain;
+      }
+      .song-cover-2 {
+        background-image: url(https://i.scdn.co/image/ab67616d00001e02e321a69d7454d9365c667187);
+
+        background-size: contain;
+      }
+      .song-cover-3 {
+        background-image: url(https://i.scdn.co/image/ab67616d00001e02e321a69d7454d9365c667187);
+        background-size: contain;
+      }
+      .song-cover-4 {
+        background-image: url(https://i.scdn.co/image/ab67616d00001e02e321a69d7454d9365c667187);
+        background-size: contain;
+      }
+      .song-cover-5 {
+        background-image: url(https://i.scdn.co/image/ab67616d00001e02e321a69d7454d9365c667187);
+        background-size: contain;
+      }
+      .song-cover-6 {
+        background-image: url(https://i.scdn.co/image/ab67616d00001e02e321a69d7454d9365c667187);
+        background-size: contain;
       }
 
       .song-title {
-        font-size: 22px;
+        font-size: 18px;
         font-weight: 700;
-        color: #ff69b4;
-        margin-bottom: 8px;
-        letter-spacing: 0.3px;
-        text-shadow: 0 2px 15px rgba(255, 105, 180, 0.3);
+        color: #ff3e8a;
+        margin-top: 18px;
+        margin-bottom: 6px;
+        letter-spacing: 0.2px;
       }
 
       .artist {
-        font-size: 17px;
-        color: #ffc0cb;
+        font-size: 15px;
+        color: #c91f6e;
         font-weight: 500;
-        letter-spacing: 0.5px;
+        margin-bottom: 14px;
+        letter-spacing: 0.3px;
       }
 
+      .song-card audio {
+        width: 100%;
+        outline: none;
+        border-radius: 12px;
+      }
       .reasons-list {
         background: white;
         border-radius: 20px;
@@ -643,6 +713,9 @@
 
         .polaroid {
           width: 200px;
+        }
+        .song-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
       }
     </style>
@@ -743,12 +816,50 @@
           <h2
             id="song-message"
             class="typewriter"
-            data-message="this song reminds me of you (>▂<), this song reminds me of you (>▂<), this song reminds me of you (>▂<),this song reminds me of you (>▂<)"
+            data-message="This are songs reminds me of you (>▂<)"
           ></h2>
-          <div class="vinyl"></div>
-          <div class="song-info">
-            <div class="song-title">The most beautiful thing - Bruno Major</div>
-            <div class="artist">secret message: July • 1:33</div>
+          <div class="song-grid">
+            <div class="song-card">
+              <div class="song-cover song-cover-1">01</div>
+              <div class="song-title">Terrified</div>
+              <div class="artist">Katharine McPhee • secret message: July</div>
+              <audio controls src="audio/Terrified.mp3"></audio>
+            </div>
+
+            <div class="song-card">
+              <div class="song-cover song-cover-2">02</div>
+              <div class="song-title">When I Met you.mp3</div>
+              <div class="artist">Nigga • secret message: July</div>
+              <audio controls src="audio/When_I_Met_you.mp3"></audio>
+            </div>
+
+            <div class="song-card">
+              <div class="song-cover song-cover-3">03</div>
+              <div class="song-title">Colbie Caillat</div>
+              <div class="artist">Nigga • secret message: July</div>
+              <audio controls src="audio/Bubbly.mp3"></audio>
+            </div>
+
+            <div class="song-card">
+              <div class="song-cover song-cover-4">04</div>
+              <div class="song-title">The Most Beautiful Thing</div>
+              <div class="artist">Nigga • secret message: July</div>
+              <audio controls src="audio/The_Most_Beautiful_Thin.mp3"></audio>
+            </div>
+
+            <div class="song-card">
+              <div class="song-cover song-cover-5">05</div>
+              <div class="song-title">The Most Beautiful Thing</div>
+              <div class="artist">Nigga • secret message: July</div>
+              <audio controls src="audio/The_Most_Beautiful_Thin.mp3"></audio>
+            </div>
+
+            <div class="song-card">
+              <div class="song-cover song-cover-6">06</div>
+              <div class="song-title">The Most Beautiful Thing</div>
+              <div class="artist">Bruno Major • secret message: July</div>
+              <audio controls src="audio/The_Most_Beautiful_Thin.mp3"></audio>
+            </div>
           </div>
         </div>
         <button class="back-btn" onclick="showScreen2()">← Back</button>
